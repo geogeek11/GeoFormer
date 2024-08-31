@@ -1,2 +1,2 @@
-# Code repository for BMVC 2024 paper - GeoFormer: A Multi-Polygon Segmentation Transformer
+# Code for GeoFormer: A Multi-Polygon Segmentation Transformer
 
