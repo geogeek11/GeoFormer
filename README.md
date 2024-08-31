@@ -1,2 +1,3 @@
-# Code for GeoFormer: A Multi-Polygon Segmentation Transformer
+# GeoFormer: A Multi-Polygon Segmentation Transformer
 
+Will be updated in relation to BMVC2024
