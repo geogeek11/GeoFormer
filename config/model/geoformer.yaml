@@ -1,0 +1,86 @@
+transformer_xformer:
+  backbone: 'swinv2' 
+  swin_params:
+    upsampling_factor: 
+    output_hidden_dims: 512
+    pyramidal_ft_maps: true
+    type_of_pos_embedding: 'heat' #['vanilla','polygonizer','heat']
+    size: 'tiny' 
+    pretrained: false 
+    img_size: 224
+    width: 224
+    height: 224
+    channels: 3
+    num_classes: 0
+    features_only: true
+    drop_rate: 0.2
+    encoder_dim: 192
+    patch_size: 4 
+    window_size: 7 
+    out_indices:
+      # - 0
+      # - 1
+      # - 2 
+      - 3
+    encoder_depth:
+      - 2
+      - 2
+      - 18
+      - 2
+    encoder_heads:
+      - 6
+      - 12
+      - 12
+      - 48
+  use_resnet_encoder: false
+  custom_embeddings: false
+  custom_embeddings_params:
+    num_obj_embeds: 100
+    num_vertex_embeddings: 229
+    num_vertex_dimensions: 2
+    embedding_dim: 512
+    max_sequence_length: 800
+    type_of_embeddings: #vtx,dim,pos,global
+      # - pos
+      - dim
+      - global
+    concat_embeddings: false
+    l2_norm: true
+    scale: 1.0
+    batch_first: true
+  encoder:
+    image_size: 224
+    patch_size: 4
+    deform_dims: 512
+  enc_attnlayers:
+    dim: 768
+    depth: 6 #Small: 3, Medium: 6, Large: 12
+    heads: 16
+    attn_flash: false #On the A100
+    use_abs_pos_emb: true
+    
+
+  decoder:
+    num_tokens: 229 
+    max_seq_len: 800
+    custom_spatial_abs_embedding: false
+    emb_dropout: 0.1 
+  dec_attnlayers:
+    dim: 512
+    depth: 8 #Small: 4, Medium: 12, Large: 24
+    heads: 24 
+    cross_attend: true
+    attn_flash: false 
+    alibi_pos_bias: true 
+    alibi_num_heads: 8    # only use ALiBi for 4 out of the 8 heads, so other 4 heads can still attend far distances
+    attn_dropout: 0.1 
+    ff_dropout: 0.2 
+    ff_swish: false
+    post_emb_norm: false
+    rotary_pos_emb: true
+    use_abs_pos_emb: true
+
+  misc_params:
+   mask_prob: 0.15
+
+  
