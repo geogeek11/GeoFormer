@@ -72,7 +72,7 @@ transformer_xformer:
     cross_attend: true
     attn_flash: false 
     alibi_pos_bias: true 
-    alibi_num_heads: 8    # only use ALiBi for 4 out of the 8 heads, so other 4 heads can still attend far distances
+    alibi_num_heads: 8    
     attn_dropout: 0.1 
     ff_dropout: 0.2 
     ff_swish: false
