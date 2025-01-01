@@ -1,0 +1,42 @@
+
+defaults:
+  - _self_  
+  - dataset: aicrowd 
+  - model: geoformer 
+  - override hydra/launcher: joblib
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled  
+
+#Only for WandB offline logging
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
+  # launcher:
+  #   n_jobs: 3 # override the number of jobs for joblib
+
+meta:
+  task: compute_metrics #['produce_inference_samples','compute_metrics']
+  appendix: aicrowd-SWIN 
+  country: ''
+  max_num_inf_samples:  
+  num_visual_inference_samples: 0 
+  run_group:  'inference'  
+  batch_size: 12 
+  valid_batch_size: 8 
+  device: 'cuda'
+  precision: 16-mixed 
+  distributed_backend: 'auto' 
+  num_gpus: -1 
+  num_workers: 16 
+  job_type: 'inference'
+  inf_type: 'nucleus' #['nucleus','greedy'] 
+  seed: 42
+  wandb_mode: 'online'
+  provided_save_path: ''
+  use_untrained_config: false 
+  chkpt_local_path_name:  'a69251b0-aicrowd-transformer_xformer-swinv2-512-pyramid_True-spatial_False-num_layers_8-num_heads_24-alibi_heads_8-rope_True-mask_0.15-aicrowd-SWINv3' 
+  chkpt_use_latest: true
+  chkpt_local_path: './ckpts/' 
+  checkpoint_run_uri: ''
+  checkpoint_artifact_uri: ''

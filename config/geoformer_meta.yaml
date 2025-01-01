@@ -1,0 +1,57 @@
+
+defaults:
+  - _self_  
+  - dataset: aicrowd 
+  - model: geoformer 
+  - override hydra/launcher: joblib
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled  
+
+#Only for WandB offline logging 
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
+  # launcher:
+  #   n_jobs: 3 # override the number of jobs for joblib
+
+meta:
+  task: ['train','test','inference'] 
+  appendix: aicrowd-SWINv3 
+  max_steps: -1 #200 #Remove when not debugging
+  num_visual_inference_sample: 0
+  country: ''
+  max_num_inf_samples:  
+  subset_training: False #Use only a random 1000 of observations
+  num_examples_in_subset: 
+  group: 'bmvc24'
+  run_group:  # 
+  num_epochs: 100 
+  patience: 3 
+  precision: 16-mixed 
+  warmup_steps: 1000
+  learning_rate: 3e-4 
+  grad_clipping_val: 5.0
+  batch_size: 12 
+  valid_batch_size: 6
+  check_val_n_epochs: 2 
+  device: 'cuda'
+  distributed_backend: 'ddp_find_unused_parameters_true' #auto 
+  num_gpus: -1 
+  num_workers: 16 
+  num_nodes: None
+  job_type: 'train'
+  log_training_sample: true
+  loss: 'nll' 
+  inf_type: 'greedy' #['nucleus','greedy'] 
+  seed: 42
+  wandb_mode: 'online'
+  restore_from_checkpoint: true
+  run_string_added: ''
+  chkpt_local_path_name: aa53b2d2-transformer_xformer-swinv2-512-pyramid_True-spatial_False-num_layers_8-num_heads_24-alibi_heads_8-rope_True-mask_0.15-aicrowd-SWINv3
+  use_untrained_config: false 
+  chkpt_use_latest: false
+  chkpt_local_path: ''
+  checkpoint_run_uri: ''
+  checkpoint_artifact_uri: ''
+  
