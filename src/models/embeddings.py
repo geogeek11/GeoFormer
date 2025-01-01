@@ -4,33 +4,6 @@ import numpy as np
 import math
 
 
-# class PatchEmbedding(nn.Module):
-#     """
-#     Performs patch embedding on an image
-#     args:
-#         img_size: size of the image
-#         patch_size: size of the patch
-#         in_chans: number of channels in the image
-#         embed_dim: embedding dimension
-#     returns:
-#           flattened patch embeddings
-#     """
-
-#     def __init__(self, img_size, patch_size, in_chans, embed_dim):
-#         super().__init__()
-#         self.img_size = img_size
-#         self.patch_size = patch_size
-#         self.n_patches = (img_size // patch_size) ** 2
-#         self.patch_size = patch_size
-#         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
-
-#     def forward(self, x):
-#         x = self.proj(x)  # (B, E, P, P)
-#         x = x.flatten(2)  # (B, E, N)
-#         x = x.transpose(1, 2)  # (B, N, E)
-#         return x
-
-
 class PolygonizerImageEmbeddings(nn.Module):
     """
     From Polygonizer: https://arxiv.org/abs/2304.04048
