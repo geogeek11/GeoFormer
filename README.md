@@ -9,6 +9,17 @@ GeoFormer is designed to predict the set of vertices that encapsulate buildings 
 
 ![GeoFormer illustration](./assets/geoformer_illustration.png)
 
+
+If you find this work useful, please consider citing our paper:
+```
+@article{khomiakov2024geoformer,
+  title={GeoFormer: A Multi-Polygon Segmentation Transformer},
+  author={Khomiakov, Maxim and Andersen, Michael Riis and Frellsen, Jes},
+  journal={arXiv preprint arXiv:2411.16616},
+  year={2024}
+}
+```
+
 ## Getting setup
 
 *Developed with Python 3.8.6*
