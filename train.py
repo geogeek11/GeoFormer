@@ -79,7 +79,7 @@ def main(cfg: DictConfig) -> None:
     seed_everything(cfg.meta.seed)
 
     root_path = get_original_cwd()
-    os.environ["WANDB_DIR"] = "/scratch/project/dd-24-65/private_geoformer_test/wandb/"
+    os.environ["WANDB_DIR"] = "./wandb/"
 
     ds, valid_ds, _ = common.dataset_loader(cfg, module_root_path=root_path)
 
