@@ -42,7 +42,7 @@ Adapt relevant arguments in `./config/inference.yaml` if necessary and run:
 2. Compute COCO evals: `python inference.py meta.task='compute_metrics'`
 
 ## Pre-trained checkpoints
-The trained model checkpoint, along with an accompanying notebook, will be available soon.
+The trained model checkpoint is available for download [here](https://drive.google.com/drive/folders/1PGmvggZGDLfQvWtw39v4DeCoXB2ExR2U?usp=sharing). 
 
 ## Acknowledgements
 We would like to thank the authors of the influential prior work upon which this work is built, including: [HEAT: Holistic Edge Attention Transformer for Structured Reconstruction](https://github.com/woodfrog/heat), [PolygonRNN++](https://github.com/fidler-lab/polyrnn-pp) as well as the frameworks of [x-transformers](https://github.com/lucidrains/x-transformers) and [pytorch image models](https://github.com/huggingface/pytorch-image-models).
