@@ -124,13 +124,14 @@ def collate_fn_multipolygon(
     sos_token=0,
     global_stop_token=3,
     num_spc_tokens=4,
+    max_seq_len = None,
     subset=None,
     random_shuffle=False,
     cycle_start_token=False,
     **kwargs
 ):
     """
-    Padds batch of variable length
+    Pads batch of variable length
 
     note: it converts things ToTensor manually here since the ToTensor transform
     assume it takes in images rather than arbitrary tensors.
@@ -142,6 +143,7 @@ def collate_fn_multipolygon(
       subset: Keys by which to only select part of the batch
       random_shuffle: If True, shuffles the sequence before adding the global stopping token
       cycle_start_token: If True, cycles the starting coordinate to another random position in the sequence
+      max_seq_len: Maximum sequence length to pad to (if None, pads to the longest sequence in the batch)
     """
 
     bdict = {
@@ -158,31 +160,20 @@ def collate_fn_multipolygon(
         "area": [],
         "metadata": [],
     }
-
-    # def max_tangent_angle_error(vertices_A, vertices_B):
-
-    #     def angle_between(v1, v2):
-    #         cos_theta = (v1 * v2).sum(dim=-1) / (torch.norm(v1, dim=-1) * torch.norm(v2, dim=-1) + 1e-7)
-    #         theta = torch.acos(torch.clamp(cos_theta, -1, 1))
-    #         return theta
-
-    #     # Perform nearest neighbor search
-    #     distances = torch.cdist(vertices_A, vertices_B)
-    #     _, closest_vertices = distances.min(dim=1)
-
-    #     # Compute tangent angles
-    #     tangent_angles = []
-    #     for i in range(vertices_A.shape[0]):
-    #         if i == 0:
-    #             v1 = vertices_A[i + 1] - vertices_A[i]
-    #         elif i == vertices_A.shape[0] - 1:
-    #             v1 = vertices_A[i] - vertices_A[i - 1]
-    #         else:
-    #             v1 = vertices_A[i + 1] - vertices_A[i - 1]
-    #         v2 = vertices_B[closest_vertices[i]] - vertices_A[i]
-    #         tangent_angles.append(angle_between(v1, v2))
-
-    #     return torch.stack(tangent_angles).max()
+    
+    def fix_seq_length(tensor, max_seq_len, pad_value):
+        seq_len, batch_size = tensor.shape[0], tensor.shape[1]
+        if seq_len > max_seq_len:
+            return tensor[:max_seq_len, :]
+        elif seq_len < max_seq_len:
+            pad_tensor = torch.full(
+                (max_seq_len - seq_len, batch_size),
+                pad_value,
+                dtype=tensor.dtype,
+                device=tensor.device,
+            )
+            return torch.cat([tensor, pad_tensor], dim=0)
+        return tensor
 
     def pad_seq(
         batch, key, with_padding=True, random_shuffle=False, cycle_start_token=False
@@ -267,6 +258,10 @@ def collate_fn_multipolygon(
                 cycled_seq = cycle_starting_coordinate(seq[:-1])  # Exclude eos_token
                 new_verts.append(torch.cat([cycled_seq, torch.tensor([eos_token])]))
             b["vertices_flat"] = new_verts
+            
+    if max_seq_len is not None:
+        bdict["vertices_flat"] = fix_seq_length(bdict["vertices_flat"], max_seq_len, pad_token)
+
 
     if random_shuffle:
         for b in batch:
@@ -285,6 +280,9 @@ def collate_fn_multipolygon(
         batch_first=False,
         padding_value=pad_token,
     )
+    
+    if max_seq_len is not None:
+        bdict["vert_obj_embeds"] = fix_seq_length(bdict["vert_obj_embeds"], max_seq_len, pad_token)
 
     if random_shuffle:
         bdict["vert_obj_embds"] = []  # TODO: doesn't work with_shuffle

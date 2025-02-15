@@ -107,6 +107,8 @@ def main(cfg: DictConfig) -> None:
                     x,
                     random_shuffle=random_shuffle_dataset,
                     cycle_start_token=random_cycle_dataset,
+                    max_seq_len=cfg.model.transformer_xformer.decoder.get(
+                        "max_seq_len", None),
                 )
             ),
             shuffle=True,
@@ -118,7 +120,11 @@ def main(cfg: DictConfig) -> None:
         valid_ds = DataLoader(
             valid_ds,
             batch_size=cfg.meta.valid_batch_size,
-            collate_fn=collate_fn,
+            collate_fn=lambda x: (
+                collate_fn(
+                    x,
+                    max_seq_len=cfg.model.transformer_xformer.decoder.get(
+                        "max_seq_len", None))),
             shuffle=False,
             drop_last=False,
             pin_memory=True,
