@@ -112,7 +112,7 @@ def load_model_from_chkpt(out_ckpt_dir, model_id, use_latest=False, cfg=None, **
     return model, cfg
 
 
-def compute_map(out_array, image_size=224, compute_by_object=True, device="cpu"):
+def compute_map(out_array, image_size=256, compute_by_object=True, device="cpu"):
     metric = MeanAveragePrecision(
         iou_type="segm",
         class_metrics=False,

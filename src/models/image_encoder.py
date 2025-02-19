@@ -10,7 +10,7 @@ from src.models.embeddings import PolygonizerImageEmbeddings, HEATImageEmbedding
 
 class CustomSwinTransformer(SwinTransformer):
 
-    def __init__(self, img_size=224, *cfg, **kwcfg):
+    def __init__(self, img_size=256, *cfg, **kwcfg):
         super(CustomSwinTransformer, self).__init__(img_size=img_size, *cfg, **kwcfg)
         self.height, self.width = img_size, img_size
 
@@ -28,7 +28,7 @@ class CustomSwinTransformerV2(SwinTransformerV2):
 
     def __init__(
         self,
-        img_size=224,
+        img_size=256,
         type_of_pos_embedding="vanilla",
         softmax_output=True,
         upsampling_factor=None,

@@ -315,9 +315,9 @@ def sort_coco_images_by_annotation_length(coco_json_path, output_json_path):
         json.dump(coco.dataset, f, indent=4)
 
 
-def sort_polygons(polygons, return_indices=False, im_dim=224):
+def sort_polygons(polygons, return_indices=False, im_dim=256):
     """
-    Sorts a list of polygons counterclockwise based on their distance to the centroid of a 224x224 square.
+    Sorts a list of polygons counterclockwise based on their distance to the centroid of a 256x256 square.
     Optionally returns the indices to sort another list with corresponding properties.
 
     Parameters

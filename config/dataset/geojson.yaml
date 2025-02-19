@@ -1,5 +1,5 @@
 geojson:
-  resize_im_size: 224
+  resize_im_size: 256
   random_shuffle: false
   cycle_start_token: false
   num_spc_tokens: 4

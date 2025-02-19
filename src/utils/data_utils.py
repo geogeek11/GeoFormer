@@ -555,7 +555,7 @@ def get_masks(
     return gt_masks, pred_masks
 
 
-def invert_cropped_mask_to_origin(img_mask, metadata, resize_im_size=224):
+def invert_cropped_mask_to_origin(img_mask, metadata, resize_im_size=256):
     """
     Takes a cropped representation of a mask and converts it back
     into the original input space (max_dim is 300,300)
