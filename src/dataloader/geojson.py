@@ -9,10 +9,16 @@ from torchvision.transforms import Resize , Normalize
 import geopandas as gpd
 from shapely.geometry import Polygon, mapping
 
+import logging
+
 class GeoJSONDataset(Dataset):
     """
     Dataset loader for image chips with corresponding GeoJSON labels
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
     def __init__(
         self,
         image_dir,
@@ -65,31 +71,51 @@ class GeoJSONDataset(Dataset):
         polygons = []
         
         for _, row in gdf.iterrows():
+            geom = row.geometry
             # Extract coordinates from the geometry
-            if row.geometry.geom_type == 'Polygon':
-                coords = np.array(row.geometry.exterior.coords)
-                # Scale coordinates to image space
-                coords = coords * (self.image_size / max(coords.max() - coords.min()))
-                # Center the coordinates
-                coords = coords - coords.min() + 10  # Add padding of 10 pixels
-                polygons.append(coords)
-            elif row.geometry.geom_type == 'MultiPolygon':
-                for polygon in row.geometry:
-                    coords = np.array(polygon.exterior.coords)
-                    coords = coords * (self.image_size / max(coords.max() - coords.min()))
-                    coords = coords - coords.min() + 10
+            if geom.geom_type == 'Polygon':
+                polys = [geom]
+            elif geom.geom_type == 'MultiPolygon':
+                polys = list(geom.geoms)  # Correctly access the individual polygons
+            else:
+                continue  # Skip other geometry types
+                
+            for poly in polys:
+                try:
+                    coords = np.array(poly.exterior.coords)
+                    if len(coords) < 3:  # Skip invalid polygons
+                        continue
+                        
+                    # Get the bounds for scaling
+                    minx, miny = coords.min(axis=0)
+                    maxx, maxy = coords.max(axis=0)
+                    
+                    # Scale coordinates to image space while preserving aspect ratio
+                    scale = self.image_size / max(maxx - minx, maxy - miny)
+                    coords = (coords - [minx, miny]) * scale
+                    
+                    # Add padding and ensure within bounds
+                    padding = 10
+                    coords = coords + padding
+                    coords = np.clip(coords, padding, self.image_size - padding)
+                    
                     polygons.append(coords)
+                except (ValueError, AttributeError) as e:
+                    print(f"Skipping invalid polygon: {e}")
+                    continue
         
-        if self.sort_polygons:
+        if self.sort_polygons and polygons:
             from src.utils.utils import sort_polygons
             polygons = sort_polygons(polygons, return_indices=False, im_dim=self.image_size)
         
         return polygons
 
     def __getitem__(self, idx):
-        # Load image
-        image_file = self.image_files[idx]
-        image_path = os.path.join(self.image_dir, image_file)
+        try:
+            # Load image
+            image_file = self.image_files[idx]
+            image_path = os.path.join(self.image_dir, image_file)
+            self.logger.debug(f"Processing image: {image_file}")
         
         # Get corresponding label file
         label_file = os.path.splitext(image_file)[0] + '.geojson'
