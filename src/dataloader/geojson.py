@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import Dataset
 from PIL import Image
 import torchvision.transforms.functional as F
-from torchvision.transforms import Resize
+from torchvision.transforms import Resize , Normalize
 import geopandas as gpd
 from shapely.geometry import Polygon, mapping
 
@@ -41,7 +41,7 @@ class GeoJSONDataset(Dataset):
         
         # Normalization parameters
         if normalize_ims:
-            self.normalizer = transforms.Normalize(
+            self.normalizer = Normalize(
                 mean=[0.485, 0.456, 0.406],
                 std=[0.229, 0.224, 0.225]
             )
