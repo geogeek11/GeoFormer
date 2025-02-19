@@ -7,7 +7,7 @@ geojson:
   enable_rand_augs: true
   normalize_ims: true
 
-  train_image_path: './data/train/images/'
-  train_label_path: './data/train/labels/'
-  valid_image_path: './data/val/images/'
-  valid_label_path: './data/val/labels/'
+  train_image_path: '/content/GeoFormer/data/train/images/'
+  train_label_path: '/content/GeoFormer/data/train/labels/'
+  valid_image_path: '/content/GeoFormer/data/val/images/'
+  valid_label_path: '/content/GeoFormer/data/val/labels/'
