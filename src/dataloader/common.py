@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Subset
 from src.dataloader.aicrowd import Aicrowd
+from src.dataloader.geojson import GeoJSONDataset
 import matplotlib.pyplot as plt
 import wandb
 import os
@@ -15,7 +16,33 @@ def dataset_loader(cfg, module_root_path=None, **kwargs):
 
     :returns ds,valid_ds: Torch.utils.data.Dataset-objects for training and validation dataset
     """
+    
+    if cfg.dataset.get("geojson"):
+        train_image_path = cfg.dataset.geojson.train_image_path
+        train_label_path = cfg.dataset.geojson.train_label_path
+        valid_image_path = cfg.dataset.geojson.valid_image_path
+        valid_label_path = cfg.dataset.geojson.valid_label_path
 
+        perform_rand_augs = cfg.dataset.geojson.get("enable_rand_augs", True)
+
+        print(f"PERFORMING AUGMENTATIONS: Using RandAugs: {perform_rand_augs}")
+
+        ds = GeoJSONDataset(
+            image_dir=os.path.join(module_root_path, train_image_path),
+            label_dir=os.path.join(module_root_path, train_label_path),
+            **cfg.dataset.geojson,
+        )
+
+        valid_ds = GeoJSONDataset(
+            image_dir=os.path.join(module_root_path, valid_image_path),
+            label_dir=os.path.join(module_root_path, valid_label_path),
+            **cfg.dataset.geojson,
+        )
+
+        test_ds = valid_ds  # Test set equals validation set
+
+        return ds, valid_ds, test_ds
+    
     if cfg.dataset.get("aicrowd"):
 
         train_path_to_images = cfg.dataset.aicrowd.train_image_path

@@ -1,0 +1,13 @@
+geojson:
+  resize_im_size: 224
+  random_shuffle: false
+  cycle_start_token: false
+  num_spc_tokens: 4
+  sort_polygons: true
+  enable_rand_augs: true
+  normalize_ims: true
+
+  train_image_path: './data/train/images/'
+  train_label_path: './data/train/labels/'
+  valid_image_path: './data/val/images/'
+  valid_label_path: './data/val/labels/'
