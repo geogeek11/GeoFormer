@@ -7,9 +7,9 @@ transformer_xformer:
     type_of_pos_embedding: 'heat' #['vanilla','polygonizer','heat']
     size: 'tiny' 
     pretrained: false 
-    img_size: 256
-    width: 256
-    height: 256
+    img_size: 224
+    width: 224
+    height: 224
     channels: 3
     num_classes: 0
     features_only: true
@@ -49,7 +49,7 @@ transformer_xformer:
     scale: 1.0
     batch_first: true
   encoder:
-    image_size: 256
+    image_size: 224
     patch_size: 4
     deform_dims: 512
   enc_attnlayers:

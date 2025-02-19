@@ -22,7 +22,7 @@ class GeoJSONDataset(Dataset):
         self,
         image_dir,
         label_dir,
-        image_size=256,
+        image_size=224,
         start_token=1,
         eos_token=2,
         pad_token=0,
@@ -36,8 +36,12 @@ class GeoJSONDataset(Dataset):
         
         self.image_dir = image_dir
         self.label_dir = label_dir
-        self.image_size = image_size
-        self.output_size = (image_size, image_size)
+        
+        # Ensure image size is divisible by window size (7)
+        self.window_size = 7
+        self.image_size = (image_size // self.window_size) * self.window_size
+        self.output_size = (self.image_size, self.image_size)
+        
         self.start_token = start_token
         self.eos_token = eos_token
         self.pad_token = pad_token
@@ -136,14 +140,14 @@ class GeoJSONDataset(Dataset):
                         coords = np.array(poly.exterior.coords)
                         if len(coords) < 3:  # Skip invalid polygons
                             continue
-                            
+                        
                         # Transform to local image coordinates
                         transformed_coords = self.transform_coordinates(
                             coords, west, south, east, north, self.image_size
                         )
                         
                         # Add padding to prevent edge artifacts
-                        padding = 0
+                        padding = 2
                         transformed_coords = np.clip(
                             transformed_coords,
                             padding,
@@ -179,14 +183,14 @@ class GeoJSONDataset(Dataset):
                 if len(parts) < 4:
                     raise ValueError(f"Invalid filename format: {image_file}")
                 # Extract coordinates from the end of the filename
-                z = int(parts[-1])  # Last part is zoom level
-                y = int(parts[-2])  # Second to last is Y
-                x = int(parts[-3])  # Third to last is X
+                z = int(parts[-1])   # Last part is zoom level
+                y = int(parts[-2])   # Second to last is Y
+                x = int(parts[-3])   # Third to last is X
             except (ValueError, IndexError) as e:
                 self.logger.error(f"Error parsing filename {image_file}: {e}")
                 raise
             
-            # Get corresponding label file, maintaining the OAM identifier format
+            # Get corresponding label file
             label_file = os.path.splitext(image_file)[0] + '.geojson'
             label_path = os.path.join(self.label_dir, label_file)
             
