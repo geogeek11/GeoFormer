@@ -172,10 +172,21 @@ class GeoJSONDataset(Dataset):
             image_file = self.image_files[idx]
             image_path = os.path.join(self.image_dir, image_file)
             
-            # Extract tile coordinates from filename (format: z_x_y.jpg)
-            z, x, y = map(int, os.path.splitext(image_file)[0].split('_'))
+            # Extract tile coordinates from filename (format: OAM-{ID}-{X}-{Y}-{Z}.jpg)
+            # Example: OAM-1861240-826122-21.jpg
+            try:
+                parts = os.path.splitext(image_file)[0].split('-')
+                if len(parts) < 4:
+                    raise ValueError(f"Invalid filename format: {image_file}")
+                # Extract coordinates from the end of the filename
+                z = int(parts[-1])  # Last part is zoom level
+                y = int(parts[-2])  # Second to last is Y
+                x = int(parts[-3])  # Third to last is X
+            except (ValueError, IndexError) as e:
+                self.logger.error(f"Error parsing filename {image_file}: {e}")
+                raise
             
-            # Get corresponding label file
+            # Get corresponding label file, maintaining the OAM identifier format
             label_file = os.path.splitext(image_file)[0] + '.geojson'
             label_path = os.path.join(self.label_dir, label_file)
             
