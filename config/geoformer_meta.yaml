@@ -22,7 +22,7 @@ meta:
   num_visual_inference_sample: 0
   country: ''
   max_num_inf_samples:  
-  subset_training: False #Use only a random 1000 of observations
+  subset_training: false #Use only a random 1000 of observations
   num_examples_in_subset: 
   group: 'bmvc24'
   run_group:  # 
