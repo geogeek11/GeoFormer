@@ -478,6 +478,10 @@ class RotaryEmbedding(nn.Module):
         super().__init__()
         self.dim = dim
         self.max_seq_len = max_seq_len
+        # Ensure dimension is even for rotary embeddings
+        if dim % 2 != 0:
+            raise ValueError(f"Dimension must be even for rotary embeddings, got {dim}")
+            
         inv_freq = 1.0 / (10000 ** (torch.arange(0, dim, 2).float() / dim))
         self.register_buffer("inv_freq", inv_freq)
 
@@ -495,6 +499,7 @@ class RotaryEmbedding(nn.Module):
         
         t = torch.arange(seq_len, device=device).type_as(self.inv_freq)
         freqs = torch.einsum("i , j -> i j", t, self.inv_freq)
+        # Ensure dimension matches for rotary embeddings
         freqs = torch.cat((freqs, freqs), dim=-1)
 
         if not exists(self.scale):
@@ -506,36 +511,34 @@ class RotaryEmbedding(nn.Module):
 
         return freqs, scale
 
-
 def rotate_half(x):
+    """Safe rotation that ensures tensor dimensions match"""
+    if x.shape[-1] % 2 != 0:
+        raise ValueError(f"Dimension to rotate must be even, got shape {x.shape}")
     x = rearrange(x, "... (j d) -> ... j d", j=2)
-    x1, x2 = x.unbind(dim=-2)
+    zeros = torch.zeros_like(x)
+    x1, x2 = x.unbind(dim=-2) 
     return torch.cat((-x2, x1), dim=-1)
 
-
 def apply_rotary_pos_emb(t, freqs, scale=1):
-    """Apply rotary positional embeddings with proper sequence length handling"""
-    # Get sequence length and ensure it doesn't exceed freqs length
+    """Applies rotary embeddings with safe sequence length handling"""
     seq_len = t.shape[-2]
-    freq_len = freqs.shape[0]
-    
-    # Truncate or pad freqs to match sequence length
-    if seq_len > freq_len:
-        # Pad freqs if sequence is longer
-        freqs = F.pad(freqs, (0, 0, 0, seq_len - freq_len))
+    if seq_len > freqs.shape[0]:
+        # Pad frequencies if needed
+        pad_amount = seq_len - freqs.shape[0]
+        freqs = F.pad(freqs, (0, 0, 0, pad_amount))
     else:
-        # Take only what we need from freqs
+        # Truncate frequencies if needed 
         freqs = freqs[:seq_len]
 
-    # Ensure both tensors are on same device
-    freqs = freqs.to(t.device)
-    
+    # Ensure shapes match for operations
+    if t.shape[-1] != freqs.shape[-1]:
+        raise ValueError(f"Tensor and frequencies dimensions must match. Got {t.shape} and {freqs.shape}")
+        
     # Apply rotary embedding
     t_cos = t * freqs.cos() * scale
     t_sin = rotate_half(t) * freqs.sin() * scale
-    
     return t_cos + t_sin
-
 # norms
 
 
