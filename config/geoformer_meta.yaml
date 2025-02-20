@@ -16,7 +16,7 @@ hydra:
   #   n_jobs: 3 # override the number of jobs for joblib
 
 meta:
-  task: ['train','test','inference'] 
+  task: ['train'] #,'test','inference'
   appendix: aicrowd-SWINv3 
   max_steps: -1 #200 #Remove when not debugging
   num_visual_inference_sample: 0
