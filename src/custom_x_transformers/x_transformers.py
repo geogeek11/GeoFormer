@@ -512,12 +512,11 @@ class RotaryEmbedding(nn.Module):
         return freqs, scale
 
 def rotate_half(x):
-    """Safe rotation that ensures tensor dimensions match"""
-    if x.shape[-1] % 2 != 0:
-        raise ValueError(f"Dimension to rotate must be even, got shape {x.shape}")
-    x = rearrange(x, "... (j d) -> ... j d", j=2)
-    zeros = torch.zeros_like(x)
-    x1, x2 = x.unbind(dim=-2) 
+    if x.shape[-1] % 2!= 0:
+        # Pad the last dimension with a zero
+        x = F.pad(x, (0, 1), value=0)
+    x = rearrange(x, "... (j d) ->... j d", j=2)
+    x1, x2 = x.unbind(dim=-2)
     return torch.cat((-x2, x1), dim=-1)
 
 def apply_rotary_pos_emb(t, freqs, scale=1):
