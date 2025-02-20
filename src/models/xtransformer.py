@@ -285,6 +285,13 @@ class XTransformerTrainer(pl.LightningModule):
         else:
             global_context = None
 
+        # --- Print statements for debugging ---
+        print("tgt_sequence shape:", tgt_sequence.shape)
+        print("tgt_sequence values:", tgt_sequence)
+        print("img shape:", img.shape)
+        print("img values:", img)
+        # -------------------------------------
+
         loss = self(tgt_sequence=tgt_sequence, img=img, global_context=global_context)
 
         self.log(
@@ -294,9 +301,8 @@ class XTransformerTrainer(pl.LightningModule):
             on_epoch=True,
             prog_bar=True,
             sync_dist=True,
-            batch_size=img.shape[0],
+            batch_size=img.shape,
         )
-
     def generate(
         self,
         start_tokens,

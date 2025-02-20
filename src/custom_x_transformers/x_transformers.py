@@ -520,24 +520,28 @@ def rotate_half(x):
     return torch.cat((-x2, x1), dim=-1)
 
 def apply_rotary_pos_emb(t, freqs, scale=1):
-    """Applies rotary embeddings with safe sequence length handling"""
     seq_len = t.shape[-2]
-    if seq_len > freqs.shape[0]:
-        # Pad frequencies if needed
-        pad_amount = seq_len - freqs.shape[0]
+    
+    # Check if `freqs` is empty or None
+    if not freqs or freqs.shape == 0:
+        raise ValueError("Frequencies tensor cannot be empty or None")
+    
+    if seq_len > freqs.shape:
+        pad_amount = seq_len - freqs.shape
         freqs = F.pad(freqs, (0, 0, 0, pad_amount))
     else:
-        # Truncate frequencies if needed 
         freqs = freqs[:seq_len]
 
-    # Ensure shapes match for operations
-    if t.shape[-1] != freqs.shape[-1]:
-        raise ValueError(f"Tensor and frequencies dimensions must match. Got {t.shape} and {freqs.shape}")
-        
-    # Apply rotary embedding
+    # Check for NaN or Inf in `t` and `freqs`
+    if torch.isnan(t).any() or torch.isinf(t).any():
+        raise ValueError("Input tensor contains NaN or Inf values")
+    if torch.isnan(freqs).any() or torch.isinf(freqs).any():
+        raise ValueError("Frequencies tensor contains NaN or Inf values")
+
     t_cos = t * freqs.cos() * scale
     t_sin = rotate_half(t) * freqs.sin() * scale
     return t_cos + t_sin
+
 # norms
 
 
