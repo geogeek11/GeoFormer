@@ -171,6 +171,7 @@ class GeoJSONDataset(Dataset):
             return []
 
     def __getitem__(self, idx):
+        print(f"Loading item {idx}")
         try:
             # Load image
             image_file = self.image_files[idx]
@@ -212,7 +213,10 @@ class GeoJSONDataset(Dataset):
             for poly in polygons:
                 # Add special tokens offset
                 vtx = poly + self.num_spc_tokens
-                
+                max_vertices = max(len(poly) for poly in polygons)
+                total_vertices = sum(len(poly) for poly in polygons)
+                print(f"Max vertices per polygon: {max_vertices}")
+                print(f"Total vertices: {total_vertices}")
                 # Create mask
                 mask = self.poly_to_mask(poly, self.image_size)
                 masks.append(mask)
@@ -248,3 +252,6 @@ class GeoJSONDataset(Dataset):
         except Exception as e:
             self.logger.error(f"Error processing index {idx} (file: {self.image_files[idx]}): {e}")
             raise
+        # After processing polygons
+        print(f"Number of polygons: {len(polygons)}")
+        print(f"First polygon shape: {polygons[0].shape if len(polygons) > 0 else None}")
