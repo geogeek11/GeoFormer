@@ -474,8 +474,10 @@ class LearnedAlibiPositionalBias(AlibiPositionalBias):
 
 
 class RotaryEmbedding(nn.Module):
-    def __init__(self, dim, use_xpos=False, scale_base=512):
+    def __init__(self, dim, use_xpos=False, scale_base=512, max_seq_len=2048):
         super().__init__()
+        self.dim = dim
+        self.max_seq_len = max_seq_len
         inv_freq = 1.0 / (10000 ** (torch.arange(0, dim, 2).float() / dim))
         self.register_buffer("inv_freq", inv_freq)
 
@@ -484,11 +486,13 @@ class RotaryEmbedding(nn.Module):
             return
 
         scale = (torch.arange(0, dim, 2) + 0.4 * dim) / (1.4 * dim)
-
         self.scale_base = scale_base
         self.register_buffer("scale", scale)
 
     def forward(self, seq_len, device):
+        # Ensure seq_len doesn't exceed maximum
+        seq_len = min(seq_len, self.max_seq_len)
+        
         t = torch.arange(seq_len, device=device).type_as(self.inv_freq)
         freqs = torch.einsum("i , j -> i j", t, self.inv_freq)
         freqs = torch.cat((freqs, freqs), dim=-1)
@@ -496,9 +500,7 @@ class RotaryEmbedding(nn.Module):
         if not exists(self.scale):
             return freqs, 1.0
 
-        power = (
-            torch.arange(seq_len, device=device) - (seq_len // 2)
-        ) / self.scale_base
+        power = (torch.arange(seq_len, device=device) - (seq_len // 2)) / self.scale_base
         scale = self.scale ** rearrange(power, "n -> n 1")
         scale = torch.cat((scale, scale), dim=-1)
 
@@ -512,10 +514,27 @@ def rotate_half(x):
 
 
 def apply_rotary_pos_emb(t, freqs, scale=1):
+    """Apply rotary positional embeddings with proper sequence length handling"""
+    # Get sequence length and ensure it doesn't exceed freqs length
     seq_len = t.shape[-2]
-    freqs = freqs[-seq_len:, :]
-    return (t * freqs.cos() * scale) + (rotate_half(t) * freqs.sin() * scale)
+    freq_len = freqs.shape[0]
+    
+    # Truncate or pad freqs to match sequence length
+    if seq_len > freq_len:
+        # Pad freqs if sequence is longer
+        freqs = F.pad(freqs, (0, 0, 0, seq_len - freq_len))
+    else:
+        # Take only what we need from freqs
+        freqs = freqs[:seq_len]
 
+    # Ensure both tensors are on same device
+    freqs = freqs.to(t.device)
+    
+    # Apply rotary embedding
+    t_cos = t * freqs.cos() * scale
+    t_sin = rotate_half(t) * freqs.sin() * scale
+    
+    return t_cos + t_sin
 
 # norms
 
