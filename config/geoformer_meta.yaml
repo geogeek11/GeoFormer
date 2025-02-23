@@ -32,13 +32,13 @@ meta:
   warmup_steps: 1000
   learning_rate: 3e-4 
   grad_clipping_val: 5.0
-  batch_size: 12 
+  batch_size: 1 
   valid_batch_size: 6
   check_val_n_epochs: 2 
   device: 'cuda'
   distributed_backend: 'ddp_find_unused_parameters_true' #auto 
   num_gpus: -1 
-  num_workers: 16 
+  num_workers: 1 
   num_nodes: None
   job_type: 'train'
   log_training_sample: true

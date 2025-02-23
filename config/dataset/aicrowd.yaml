@@ -7,7 +7,7 @@ aicrowd:
   enable_rand_augs: true
   normalize_ims: false
 
-  train_image_path: './data/aicrowd_mapping_challenge/train/images/'
-  train_annot_path: './data/aicrowd_mapping_challenge/train/annotation-small.json'
-  valid_image_path: './data/aicrowd_mapping_challenge/val/images/'
-  valid_annot_path: './data/aicrowd_mapping_challenge/val/annotation-small.json'
+  train_image_path: '/content/GeoFormer/data/train/images/'
+  train_annot_path: '/content/GeoFormer/data/train/annotation-small.json'
+  valid_image_path: '/content/GeoFormer/data/val/images/'
+  valid_annot_path: '/content/GeoFormer/data/val/annotation-small.json'
