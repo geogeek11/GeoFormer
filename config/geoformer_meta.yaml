@@ -48,7 +48,7 @@ meta:
   wandb_mode: 'online'
   restore_from_checkpoint: true
   run_string_added: ''
-  chkpt_local_path_name: bdd18053-aicrowd-transformer_xformer-swinv2-512-pyramid_True-spatial_False-num_layers_8-num_heads_24-alibi_heads_8-rope_True-mask_0.15-aicrowd-SWINv3
+  chkpt_local_path_name: ced18098-aicrowd-transformer_xformer-swinv2-512-pyramid_True-spatial_False-num_layers_8-num_heads_24-alibi_heads_8-rope_True-mask_0.15-aicrowd-SWINv3
   use_untrained_config: false 
   chkpt_use_latest: false
   chkpt_local_path: ''
